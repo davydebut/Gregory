@@ -25,36 +25,38 @@ if (isset($_POST['connect'])) { // si le formulaire a été soumis
             $_SESSION['pseudo'] = $pseudo;
         }
     }
+    // var_dump($_SESSION);
 }
 
 if (isset($_POST['submit'])) {
     $pseudo = $_POST['pseudo'];
     $password = $_POST['password'];
-    $password = password_hash($password, PASSWORD_DEFAULT);
+    $email = $_POST['email'];
+    $password_clean = password_hash($password, PASSWORD_DEFAULT);
     $db = dbconnect();
     if (empty($pseudo) || empty($password) || empty($email)) {
         echo '<p>Veuillez remplir tous les champs</p>';
     } else {
-    $prepare = $db->prepare("SELECT COUNT(*) AS nbre FROM user WHERE pseudo = :pseudo AND password = :password");
-    $prepare->execute(['pseudo' => $pseudo, 'password' => $password]);
-    $result = $prepare->fetch(PDO::FETCH_ASSOC);
-    // si le pseudo n'existe pas
-    if ($result['nbre'] == 0) {
-        $email = $_POST['email'];
-        $isSuccess = true;
-        $prepare = $db->prepare("INSERT INTO user (pseudo, password, email) VALUES (:pseudo, :password, :email)");
-        $prepare->execute([
-            'pseudo' => $pseudo,
-            'password' => $password,
-            'email' => $email
-        ]);
-        // si le pseudo existe déjà
-    } else {
-        // echo '<p>Ce pseudo est déjà utilisé</p>';
-        $connect = true;
-        $_SESSION['pseudo'] = $pseudo;
+        $prepare = $db->prepare("SELECT COUNT(*) AS nbre FROM user WHERE pseudo = :pseudo AND password = :password");
+        $prepare->execute(['pseudo' => $pseudo, 'password' => $password]);
+        $result = $prepare->fetch(PDO::FETCH_ASSOC);
+        // si le pseudo n'existe pas
+        if ($result['nbre'] == 0) {
+            $email = $_POST['email'];
+            $isSuccess = true;
+            $prepare = $db->prepare("INSERT INTO user (pseudo, password, email) VALUES (:pseudo, :password, :email)");
+            $prepare->execute([
+                'pseudo' => $pseudo,
+                'password' => $password_clean,
+                'email' => $email
+            ]);
+            // si le pseudo existe déjà
+        } else {
+            // echo '<p>Ce pseudo est déjà utilisé</p>';
+            $connect = true;
+            $_SESSION['pseudo'] = $pseudo;
+        }
     }
-}
 }
 
 function getAllPosts()
@@ -71,12 +73,12 @@ function getPostById($id)
     $db = dbconnect();
     $query = $db->prepare('SELECT * FROM posts INNER JOIN user ON posts.author_id = user.id WHERE posts.id = :id');
     $query->execute(['id' => $id]);
-    $post = $query->fetch(PDO::FETCH_ASSOC);
+    $post = $query->fetchAll(PDO::FETCH_ASSOC);
     return $post;
 }
 
 // fonction ajouter un post
-function addPost()
+/* function addPost()
 {   
     if(isset($_POST['submit'])) {
         $db = dbconnect();
@@ -94,4 +96,4 @@ function addPost()
             'author_id' => $author_id
         ]);
     }
-}
+} */
