@@ -77,6 +77,16 @@ function getPostById($id)
     return $post;
 }
 
+// créer un fonction qui récupère toute les catégories
+function getAllCategories()
+{
+    $db = dbconnect();
+    $query = $db->prepare('SELECT * FROM category');
+    $query->execute();
+    $categories = $query->fetchAll(PDO::FETCH_ASSOC);
+    return $categories;
+}
+
 // fonction ajouter un post
 /* function addPost()
 {   

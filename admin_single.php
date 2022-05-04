@@ -46,6 +46,9 @@ if (isset($_POST["ajouter"])) {
 }
 
 include 'partials/head.php';
+
+$categories = getAllCategories();
+
 ?>
 <!-- formulaire d'ajout d'article -->
 <form action="admin_single.php" method="post" enctype="multipart/form-data">
@@ -59,8 +62,11 @@ include 'partials/head.php';
         <input type="file" name="image">
         <label for="category">Catégorie :</label>
         <select name="category" id="category">
-            <option value="1">1</option>
-            <option value="2">2</option>
+            <?php
+            foreach ($categories as $category) {
+                echo '<option value="' . $category['id'] . '">' . $category['name'] . '</option>';
+            }
+            ?>
         </select>
         <input type="submit" name="ajouter" value="Ajouter l'article">
     </fieldset>
